@@ -1,13 +1,12 @@
-using Discord.Commands;
 using Discord.Interactions;
 
 namespace IT_Nanny.Commands.TestModule;
 
-public class TestModule : ModuleBase<SocketCommandContext>
+public class TestModule : InteractionModuleBase
 {
-    [SlashCommand("/test", "Test command")]
+    [SlashCommand("test", "test command")]
     public async Task TestAsync()
     {
-        await ReplyAsync("success");
+        await RespondAsync("success");
     }
 }
