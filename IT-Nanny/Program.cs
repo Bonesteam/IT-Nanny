@@ -1,33 +1,31 @@
 ﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
+using IT_Nanny.Commands.TestModule;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IT_Nanny;
 
 public class Program
 {
-    private static DiscordSocketClient _client;
+    private const string Token = "MTE3OTgxOTQzNDUyNTg2ODE1Mg.G5lqci.GHE1aQo5V8Xm6CPdcvbyNVXFHpQ0RMhg7V-FDo";
 
     public static async Task Main(string[] args)
     {
-        _client = new DiscordSocketClient();
-
-        _client.Log += Log;
-
-        var token = "MTE3OTgxOTQzNDUyNTg2ODE1Mg.GDOsE-.cZvyovACd33dlTAoZKpYwffZL12jKB3pGpdpkQ";
-        await _client.LoginAsync(TokenType.Bot, token);
-        await _client.StartAsync();
-
-        _client.MessageReceived += async (m) =>
+        var client = new DiscordSocketClient();
+        await client.LoginAsync(TokenType.Bot, Token);
+        await client.StartAsync();
+        while (client.ConnectionState != ConnectionState.Connected)
         {
-            await m.Channel.SendMessageAsync("Dungeon Master");
-        };
+            await Task.Delay(TimeSpan.FromMilliseconds(50));
+        }
+        var serviceProvider = new ServiceCollection()
+            .AddSingleton<IDiscordClient, DiscordSocketClient>(s => client)
+            .BuildServiceProvider();
         
-        await Task.Delay(-1);
-    }
-    
-    private static Task Log(LogMessage msg)
-    {
-        Console.WriteLine(msg.ToString());
-        return Task.CompletedTask;
+        var commandService = new CommandService();
+        await commandService.AddModuleAsync<TestModule>(serviceProvider);
+        
+        await Task.Delay(Timeout.Infinite);
     }
 }
