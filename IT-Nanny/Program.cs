@@ -41,6 +41,7 @@ public class Program
             await Task.CompletedTask;
         };
         client.Ready += async () =>
+        client.Connected += async () =>
         {
             await interactionService.RegisterCommandsToGuildAsync(1178625555038482474);
         };
